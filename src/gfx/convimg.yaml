@@ -1,0 +1,87 @@
+palettes:
+  - name: daytimePalette # Pico-8 palette!
+    fixed-entries:
+      - color: {index: 0, hex: "#000000"}
+      - color: {index: 1, hex: "#1D2B53"}
+      - color: {index: 2, hex: "#7E2553"}
+      - color: {index: 3, hex: "#008751"}
+      - color: {index: 4, hex: "#AB5236"}
+      - color: {index: 5, hex: "#5F574F"}
+      - color: {index: 6, hex: "#C2C3C7"}
+      - color: {index: 7, hex: "#FFF1E8"}
+      - color: {index: 8, hex: "#FF004D"}
+      - color: {index: 9, hex: "#FFA300"}
+      - color: {index: 10, hex: "#FFEC27"}
+      - color: {index: 11, hex: "#00E436"}
+      - color: {index: 12, hex: "#29ADFF"}
+      - color: {index: 13, hex: "#83769C"}
+      - color: {index: 14, hex: "#FF77A8"}
+      - color: {index: 15, hex: "#FFCCAA"}
+      - color: {index: 16, hex: "#EF1C41"}
+    images: automatic
+  - name: betweenPalette
+    fixed-entries:
+      - color: {index: 0, hex: "#000000"}
+      - color: {index: 1, hex: "#090E5A"}
+      - color: {index: 2, hex: "#300C5A"}
+      - color: {index: 3, hex: "#003559"}
+      - color: {index: 4, hex: "#4A1C3D"}
+      - color: {index: 5, hex: "#5F574F"}
+      - color: {index: 6, hex: "#5A5BB1"}
+      - color: {index: 7, hex: "#FF82EB"}
+      - color: {index: 8, hex: "#FF0055"}
+      - color: {index: 9, hex: "#FF4500"}
+      - color: {index: 10, hex: "#FF7D2B"}
+      - color: {index: 11, hex: "#00763D"}
+      - color: {index: 12, hex: "#2145AB"}
+      - color: {index: 13, hex: "#332C81"}
+      - color: {index: 14, hex: "#FF2D85"}
+      - color: {index: 15, hex: "#FF6285"}
+      - color: {index: 16, hex: "#EF1C41"}
+  - name: nighttimePalette
+    fixed-entries:
+      - color: {index: 0, hex: "#000000"}
+      - color: {index: 1, hex: "#1D2B53"}
+      - color: {index: 2, hex: "#7E2553"}
+      - color: {index: 3, hex: "#003459"}
+      - color: {index: 4, hex: "#491C38"}
+      - color: {index: 5, hex: "#28201E"}
+      - color: {index: 6, hex: "#22228A"}
+      - color: {index: 7, hex: "#5A5AB9"}
+      - color: {index: 8, hex: "#FF004D"}
+      - color: {index: 9, hex: "#FF4500"}
+      - color: {index: 10, hex: "#FF7D28"}
+      - color: {index: 11, hex: "#007538"}
+      - color: {index: 12, hex: "#092D6E"}
+      - color: {index: 13, hex: "#0E0D4B"}
+      - color: {index: 14, hex: "#FF77A8"}
+      - color: {index: 15, hex: "#FF6285"}
+      - color: {index: 16, hex: "#EF1C41"}
+
+converts:
+  - name: sprites
+    palette: daytimePalette
+    images:
+      - cloud0.png
+      - cloud1.png
+      - car.png
+      - womptruck.png
+      - walrii.png
+  - name: tilesets
+    palette: daytimePalette
+    tilesets:
+      tile-width: 20
+      tile-height: 20
+      images:
+        - tilesDefault.png
+
+outputs:
+  - type: c
+    include-file: gfx.h
+    palettes:
+      - daytimePalette
+      - betweenPalette
+      - nighttimePalette
+    converts:
+      - sprites
+      - tilesets

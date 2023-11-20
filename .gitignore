@@ -1,0 +1,9 @@
+.vscode
+obj/
+bin/
+src/gfx/*.c
+src/gfx/*.h
+src/gfx/*.8xv
+src/gfx/*.yaml.lst
+.DS_Store
+convimg.out
