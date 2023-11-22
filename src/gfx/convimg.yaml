@@ -67,6 +67,7 @@ converts:
       - car.png
       - womptruck.png
       - walrii.png
+      - lettuceDelivery.png
   - name: tilesets
     palette: daytimePalette
     tilesets:

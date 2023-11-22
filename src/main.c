@@ -58,7 +58,7 @@ int main(void) {
     uint8_t numberOfStars = 0;
 
     gfx_sprite_t *cloudSprites[2] = {cloud0, cloud1};
-    gfx_sprite_t *vehicleSprites[3] = {car, womptruck, walrii};
+    gfx_sprite_t *vehicleSprites[4] = {car, womptruck, walrii, lettuceDelivery};
 
     while (!kb_AnyKey()) {
         if (clock() - clockOffset > CLOCKS_PER_SEC / 20) {
@@ -93,19 +93,19 @@ int main(void) {
                     bool direction = randInt(0, 1);
                     clouds[numberOfClouds].x = -60 + 380 * direction;
                     clouds[numberOfClouds].y = randInt(0, 28);
-                    clouds[numberOfClouds].xVelocity = 1 - 2 * (direction);
+                    clouds[numberOfClouds].velocity = 1 - 2 * (direction);
                     clouds[numberOfClouds].type = randInt(0, 1);
                     numberOfClouds++;
                 }
 
                 for (uint8_t i = 0; i < numberOfClouds; i++) {
-                    clouds[i].x += clouds[i].xVelocity;
+                    clouds[i].x += clouds[i].velocity;
 
                     if (clouds[i].x > 320 || clouds[i].x < -60) {
                         for (uint8_t j = i; j < numberOfClouds - 1; j++) { // Delete cloud and shift list (probably a better way to do this)
                             clouds[j].x = clouds[j + 1].x;
                             clouds[j].y = clouds[j + 1].y;
-                            clouds[j].xVelocity = clouds[j + 1].xVelocity;
+                            clouds[j].velocity = clouds[j + 1].velocity;
                             clouds[j].type = clouds[j + 1].type;
                         }
 
@@ -147,15 +147,15 @@ int main(void) {
 
             if (randInt(1, 15) == 1 && numberOfCars < MAX_CARS) {
                 bool direction = randInt(0, 1);
-                cars[numberOfCars].type = randInt(0, 2);
+                cars[numberOfCars].type = randInt(0, 3);
                 cars[numberOfCars].x = -vehicleSprites[cars[numberOfCars].type]->width + (320 + vehicleSprites[cars[numberOfCars].type]->width) * direction;
                 cars[numberOfCars].y = randInt(220, 225) - vehicleSprites[cars[numberOfCars].type]->height;
                 cars[numberOfCars].y -= 50 * direction;
-                cars[numberOfCars].xVelocity = 4 - 8 * (direction);
+                cars[numberOfCars].velocity = 4 - 8 * (direction);
                 bool carCollides = false;
 
                 for (uint8_t i = 0; i < numberOfCars; i++) { // DON'T SPAWN ON TOP OF EACH OTHER (VERY BAD)
-                    if ((cars[numberOfCars].xVelocity & ~127) == (cars[i].xVelocity & ~127)) {
+                    if ((cars[numberOfCars].velocity & ~127) == (cars[i].velocity & ~127)) {
                         carCollides = gfx_CheckRectangleHotspot(
                             cars[numberOfCars].x, cars[numberOfCars].y,
                             vehicleSprites[cars[numberOfCars].type]->width, vehicleSprites[cars[numberOfCars].type]->height,
@@ -168,21 +168,21 @@ int main(void) {
 
             for (int8_t priority = -1; priority < 2; priority += 2) {
                 for (uint8_t i = 0; i < numberOfCars; i++) {
-                    if ((cars[i].xVelocity & ~127) == (priority & ~127)) {
-                        cars[i].x += cars[i].xVelocity;
+                    if ((cars[i].velocity & ~127) == (priority & ~127)) {
+                        cars[i].x += cars[i].velocity;
 
                         if (cars[i].x > 320 || cars[i].x < -vehicleSprites[cars[i].type]->width) {
                             for (uint8_t j = i; j < numberOfCars - 1; j++) {
                                 cars[j].x = cars[j + 1].x;
                                 cars[j].y = cars[j + 1].y;
-                                cars[j].xVelocity = cars[j + 1].xVelocity;
+                                cars[j].velocity = cars[j + 1].velocity;
                                 cars[j].type = cars[j + 1].type;
                             }
 
                             numberOfCars--;
                         }
 
-                        if (cars[i].xVelocity < 0) {
+                        if (cars[i].velocity < 0) {
                             gfx_sprite_t *tempSprite = gfx_MallocSprite(vehicleSprites[cars[i].type]->width, vehicleSprites[cars[i].type]->height);
                             gfx_FlipSpriteY(vehicleSprites[cars[i].type], tempSprite);
                             gfx_TransparentSprite(tempSprite, cars[i].x, cars[i].y);

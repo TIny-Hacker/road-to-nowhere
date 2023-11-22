@@ -21,7 +21,7 @@ extern "C" {
 struct object_t {
     int x;
     uint8_t y;
-    int8_t xVelocity;
+    int8_t velocity;
     int frame;
     uint8_t type;
 };
