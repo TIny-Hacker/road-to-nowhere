@@ -1,7 +1,7 @@
 /**
  * --------------------------------------
  * 
- * Road to Nowhere Source Code - main.c
+ * Road to Nowhere
  * By TIny_Hacker
  * Copyright 2023
  * License: GPL-3.0
@@ -10,6 +10,8 @@
 **/
 
 #include "defines.h"
+
+#include "asm/spi.h"
 #include "gfx/gfx.h"
 
 #include <graphx.h>
@@ -40,10 +42,15 @@ int main(void) {
 
     uint8_t time[3];
     bool useClouds = true;
+    boot_GetDate(NULL, &time[MONTHS], NULL);
+    bool snowing = (time[MONTHS] <= 3 || time[MONTHS] >= 11);
 
+    setupSPI();
     gfx_Begin();
-    gfx_SetDrawBuffer();
     gfx_SetTransparentColor(16);
+    gfx_SetDrawBuffer();
+    gfx_Tilemap_NoClip(&background, 0, 0);
+    gfx_SetDrawScreen();
 
     while (kb_AnyKey());
 
@@ -52,16 +59,104 @@ int main(void) {
     struct object_t cars[MAX_CARS];
     struct object_t clouds[MAX_CLOUDS];
     struct object_t stars[MAX_STARS];
+    struct object_t snow[MAX_SNOW];
 
     uint8_t numberOfCars = 0;
     uint8_t numberOfClouds = 0;
     uint8_t numberOfStars = 0;
+    uint8_t numberOfSnow = 0;
 
     gfx_sprite_t *cloudSprites[2] = {cloud0, cloud1};
     gfx_sprite_t *vehicleSprites[4] = {car, womptruck, walrii, lettuceDelivery};
 
     while (!kb_AnyKey()) {
         if (clock() - clockOffset > CLOCKS_PER_SEC / 20) {
+            for (uint8_t i = 0; i < numberOfCars - 1; i++) { // Detect crashes first
+                for (uint8_t j = i + 1; j < numberOfCars; j++) {
+                    if ((cars[i].velocity & ~127) == (cars[j].velocity & ~127)) {
+                        if (i != j && gfx_CheckRectangleHotspot(
+                            cars[i].x, cars[i].y, vehicleSprites[cars[i].type]->width, vehicleSprites[cars[i].type]->height,
+                            cars[j].x, cars[j].y, vehicleSprites[cars[j].type]->width, vehicleSprites[cars[j].type]->height)) {
+
+                            gfx_BlitRectangle(gfx_buffer, cars[i].x, cars[i].y, vehicleSprites[cars[i].type]->width, vehicleSprites[cars[i].type]->height);
+                            gfx_BlitRectangle(gfx_buffer, cars[j].x, cars[j].y, vehicleSprites[cars[j].type]->width, vehicleSprites[cars[j].type]->height);
+                            gfx_BlitScreen();
+                            int explosionX = cars[i].x + vehicleSprites[cars[i].type]->width * (cars[i].x < cars[j].x);;
+                            int explosionY = cars[i].y + vehicleSprites[cars[i].type]->height / 2;
+                            gfx_sprite_t *tempSprite1 = gfx_MallocSprite(vehicleSprites[cars[i].type]->width, vehicleSprites[cars[i].type]->height);
+                            gfx_sprite_t *tempSprite2 = gfx_MallocSprite(vehicleSprites[cars[j].type]->width, vehicleSprites[cars[j].type]->height);
+
+                            if (cars[i].velocity < 0) {
+                                gfx_FlipSpriteY(vehicleSprites[cars[i].type], tempSprite1);
+                                gfx_FlipSpriteY(vehicleSprites[cars[j].type], tempSprite2);
+                            } else {
+                                free(tempSprite1);
+                                free(tempSprite2);
+                                tempSprite1 = vehicleSprites[cars[i].type];
+                                tempSprite2 = vehicleSprites[cars[j].type];
+                            }
+
+                            gfx_TransparentSprite(tempSprite1, cars[i].x, cars[i].y);
+                            gfx_TransparentSprite(tempSprite2, cars[j].x, cars[j].y);
+
+                            for (uint8_t shakeFrame = 0; shakeFrame < 25; shakeFrame++) {
+                                gfx_ShiftDown(3);
+                                gfx_ShiftUp(3);
+                                gfx_ShiftLeft(3);
+                                gfx_ShiftRight(3);
+                                gfx_SetColor(randInt(8, 10));
+                                gfx_FillCircle(explosionX + randInt(-shakeFrame, shakeFrame), explosionY + randInt(-shakeFrame, shakeFrame), randInt(3, 6));
+                            }
+
+                            while (cars[i].y + vehicleSprites[cars[i].type]->height > 0 || cars[j].y < 240) {
+                                beginFrame();
+                                gfx_BlitBuffer();
+
+                                if (cars[i].y + vehicleSprites[cars[i].type]->height > 0) {
+                                    cars[i].y -= 20;
+                                }
+
+                                if (cars[j].y < 240) {
+                                    cars[j].y += 20;
+                                }
+
+                                gfx_TransparentSprite(tempSprite1, cars[i].x, cars[i].y);
+                                gfx_TransparentSprite(tempSprite2, cars[j].x, cars[j].y);
+                                endFrame();
+                            }
+
+                            for (uint8_t h = i; h < numberOfSnow - 1; h++) { // Probably getting points docked for excessive for loops and yes this could be better but I'm too lazy and it's more fun to add goofy stuff
+                                snow[h].x = snow[h + 1].x;
+                                snow[h].y = snow[h + 1].y;
+                                snow[h].velocity = snow[h + 1].velocity;
+                                snow[h].type = snow[h + 1].type;
+                                snow[h].frame = snow[h + 1].frame;
+                            }
+
+                            for (uint8_t h = j; h < numberOfSnow - 1; h++) {
+                                snow[h].x = snow[h + 1].x;
+                                snow[h].y = snow[h + 1].y;
+                                snow[h].velocity = snow[h + 1].velocity;
+                                snow[h].type = snow[h + 1].type;
+                                snow[h].frame = snow[h + 1].frame;
+                            }
+
+                            numberOfSnow -= 2;
+                            gfx_Tilemap_NoClip(&background, 0, 0);
+
+                            if (cars[i].velocity < 0) {
+                                free(tempSprite1);
+                                free(tempSprite2);
+                            }
+
+                            gfx_BlitScreen();
+                        }
+                    }
+                }
+            }
+
+            beginFrame();
+            gfx_BlitBuffer();
             // Update timer offset
             clockOffset = clock();
 
@@ -85,8 +180,6 @@ int main(void) {
                     gfx_SetPalette(nighttimePalette, sizeof_nighttimePalette, 0);
                 }
             }
-
-            gfx_Tilemap_NoClip(&background, 0, 0);
 
             if (useClouds) {
                 if (randInt(1, 100) == 1 && numberOfClouds < MAX_CLOUDS) {
@@ -128,7 +221,7 @@ int main(void) {
 
                     if (stars[i].frame >= 300) {
                         gfx_SetColor(12);
-                        gfx_FillRectangle_NoClip(stars[i].x, stars[i].y, stars[i].type, stars[i].type);
+                        gfx_FillRectangle(stars[i].x, stars[i].y, stars[i].type, stars[i].type);
 
                         for (uint8_t j = i; j < numberOfStars - 1; j++) {
                             stars[j].x = stars[j + 1].x;
@@ -141,7 +234,7 @@ int main(void) {
                     }
 
                     gfx_SetColor(7);
-                    gfx_FillRectangle_NoClip(stars[i].x, stars[i].y, stars[i].type, stars[i].type);
+                    gfx_FillRectangle(stars[i].x, stars[i].y, stars[i].type, stars[i].type);
                 }
             }
 
@@ -151,7 +244,7 @@ int main(void) {
                 cars[numberOfCars].x = -vehicleSprites[cars[numberOfCars].type]->width + (320 + vehicleSprites[cars[numberOfCars].type]->width) * direction;
                 cars[numberOfCars].y = randInt(220, 225) - vehicleSprites[cars[numberOfCars].type]->height;
                 cars[numberOfCars].y -= 50 * direction;
-                cars[numberOfCars].velocity = 4 - 8 * (direction);
+                cars[numberOfCars].velocity = 5 - 10 * (direction);
                 bool carCollides = false;
 
                 for (uint8_t i = 0; i < numberOfCars; i++) { // DON'T SPAWN ON TOP OF EACH OTHER (VERY BAD)
@@ -182,6 +275,16 @@ int main(void) {
                             numberOfCars--;
                         }
 
+                        gfx_SetDrawBuffer();
+
+                        // Chance of speeding up on snow
+                        if (gfx_GetPixel(cars[i].x, cars[i].y + vehicleSprites[cars[i].type]->height) == 7 && randInt(1, 15) == 1) {
+                            cars[i].velocity *= 2;
+                            asm("push hl\n\tld hl, -1\n\tld(hl), 2\n\tpop hl");
+                        }
+
+                        gfx_SetDrawScreen();
+
                         if (cars[i].velocity < 0) {
                             gfx_sprite_t *tempSprite = gfx_MallocSprite(vehicleSprites[cars[i].type]->width, vehicleSprites[cars[i].type]->height);
                             gfx_FlipSpriteY(vehicleSprites[cars[i].type], tempSprite);
@@ -194,7 +297,45 @@ int main(void) {
                 }
             }
 
-            gfx_BlitBuffer();
+            if (snowing && randInt(1, 4) == 1 && numberOfSnow < MAX_SNOW) {
+                snow[numberOfSnow].type = randInt(1, 2);
+                snow[numberOfSnow].x = randInt(0, 319);
+                snow[numberOfSnow].y = randInt(0, 64);
+                snow[numberOfSnow].velocity = randInt(1, 3);
+                snow[numberOfSnow].frame = randInt(snow[numberOfSnow].y + 1, 239); // Use this as the final Y value where the snow lands in this case
+                numberOfSnow++;
+            }
+
+            for (uint8_t i = 0; i < numberOfSnow; i++) {
+                snow[i].y += snow[i].velocity;
+
+                gfx_SetColor(7);
+                gfx_FillRectangle(snow[i].x, snow[i].y, snow[i].type, snow[i].type);
+
+                gfx_SetDrawBuffer();
+
+                if (snow[i].y >= snow[i].frame) { 
+                    if (gfx_GetPixel(snow[i].x, snow[i].y + 1) != 12) {
+                        gfx_FillRectangle(snow[i].x, snow[i].y, snow[i].type, snow[i].type); // Preserve snow to the buffer as it has "landed"
+
+                        for (uint8_t j = i; j < numberOfSnow - 1; j++) {
+                            snow[j].x = snow[j + 1].x;
+                            snow[j].y = snow[j + 1].y;
+                            snow[j].velocity = snow[j + 1].velocity;
+                            snow[j].type = snow[j + 1].type;
+                            snow[j].frame = snow[j + 1].frame;
+                        }
+
+                        numberOfSnow--;
+                    } else {
+                        snow[i].frame = randInt(snow[i].y + 1, 239);
+                    }
+                }
+
+                gfx_SetDrawScreen();
+            }
+
+            endFrame();
         }
     }
 

@@ -1,14 +1,3 @@
-/**
- * --------------------------------------
- * 
- * Road to Nowhere Source Code - defines.h
- * By TIny_Hacker
- * Copyright 2023
- * License: GPL-3.0
- * 
- * --------------------------------------
-**/
-
 #ifndef DEFINES_H
 #define DEFINES_H
 
@@ -20,7 +9,7 @@ extern "C" {
 
 struct object_t {
     int x;
-    uint8_t y;
+    int y;
     int8_t velocity;
     int frame;
     uint8_t type;
@@ -36,9 +25,14 @@ struct object_t {
 #define MINUTES             1
 #define HOURS               2
 
+#define DAYS                0
+#define MONTHS              1
+#define YEARS               2
+
 #define MAX_CARS            5
 #define MAX_CLOUDS          5
 #define MAX_STARS           20
+#define MAX_SNOW            30
 
 #ifdef __cplusplus
 }
