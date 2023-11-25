@@ -67,7 +67,7 @@ int main(void) {
     uint8_t numberOfSnow = 0;
 
     gfx_sprite_t *cloudSprites[2] = {cloud0, cloud1};
-    gfx_sprite_t *vehicleSprites[4] = {car, womptruck, walrii, lettuceDelivery};
+    gfx_sprite_t *vehicleSprites[9] = {car, womptruck, walrii, lettuceDelivery, geopipe, flyingCemetech, kermMobile};
 
     while (!kb_AnyKey()) {
         if (clock() - clockOffset > CLOCKS_PER_SEC / 20) {
@@ -240,7 +240,7 @@ int main(void) {
 
             if (randInt(1, 15) == 1 && numberOfCars < MAX_CARS) {
                 bool direction = randInt(0, 1);
-                cars[numberOfCars].type = randInt(0, 3);
+                cars[numberOfCars].type = randInt(0, 8);
                 cars[numberOfCars].x = -vehicleSprites[cars[numberOfCars].type]->width + (320 + vehicleSprites[cars[numberOfCars].type]->width) * direction;
                 cars[numberOfCars].y = randInt(220, 225) - vehicleSprites[cars[numberOfCars].type]->height;
                 cars[numberOfCars].y -= 50 * direction;
@@ -280,7 +280,6 @@ int main(void) {
                         // Chance of speeding up on snow
                         if (gfx_GetPixel(cars[i].x, cars[i].y + vehicleSprites[cars[i].type]->height) == 7 && randInt(1, 15) == 1) {
                             cars[i].velocity *= 2;
-                            asm("push hl\n\tld hl, -1\n\tld(hl), 2\n\tpop hl");
                         }
 
                         gfx_SetDrawScreen();

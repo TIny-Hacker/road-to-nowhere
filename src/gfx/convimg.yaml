@@ -68,6 +68,11 @@ converts:
       - womptruck.png
       - walrii.png
       - lettuceDelivery.png
+      - geopipe.png
+      - flyingCemetech.png
+      - kermMobile.png
+      - grapetruck.png
+      - logicalmotorcycle.png
   - name: tilesets
     palette: daytimePalette
     tilesets:
