@@ -73,6 +73,7 @@ converts:
       - kermMobile.png
       - grapetruck.png
       - logicalmotorcycle.png # Do not question his feet
+      - christmas.png
   - name: tilesets
     palette: daytimePalette
     tilesets:
