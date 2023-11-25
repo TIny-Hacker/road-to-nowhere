@@ -29,13 +29,13 @@ palettes:
       - color: {index: 5, hex: "#5F574F"}
       - color: {index: 6, hex: "#5A5BB1"}
       - color: {index: 7, hex: "#FF82EB"}
-      - color: {index: 8, hex: "#FF0055"}
+      - color: {index: 8, hex: "#982B4A"}
       - color: {index: 9, hex: "#FF4500"}
       - color: {index: 10, hex: "#FF7D2B"}
       - color: {index: 11, hex: "#00763D"}
       - color: {index: 12, hex: "#2145AB"}
       - color: {index: 13, hex: "#332C81"}
-      - color: {index: 14, hex: "#FF2D85"}
+      - color: {index: 14, hex: "#984E68"}
       - color: {index: 15, hex: "#FF6285"}
       - color: {index: 16, hex: "#EF1C41"}
   - name: nighttimePalette
@@ -48,13 +48,13 @@ palettes:
       - color: {index: 5, hex: "#28201E"}
       - color: {index: 6, hex: "#22228A"}
       - color: {index: 7, hex: "#5A5AB9"}
-      - color: {index: 8, hex: "#FF004D"}
+      - color: {index: 8, hex: "#663443"}
       - color: {index: 9, hex: "#FF4500"}
       - color: {index: 10, hex: "#FF7D28"}
       - color: {index: 11, hex: "#007538"}
       - color: {index: 12, hex: "#092D6E"}
       - color: {index: 13, hex: "#0E0D4B"}
-      - color: {index: 14, hex: "#FF77A8"}
+      - color: {index: 14, hex: "#5C3543"}
       - color: {index: 15, hex: "#FF6285"}
       - color: {index: 16, hex: "#EF1C41"}
 
