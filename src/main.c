@@ -67,7 +67,7 @@ int main(void) {
     uint8_t numberOfSnow = 0;
 
     gfx_sprite_t *cloudSprites[2] = {cloud0, cloud1};
-    gfx_sprite_t *vehicleSprites[9] = {car, womptruck, walrii, lettuceDelivery, geopipe, flyingCemetech, kermMobile};
+    gfx_sprite_t *vehicleSprites[9] = {car, womptruck, walrii, lettuceDelivery, geopipe, flyingCemetech, kermMobile, logicalmotorcycle, grapetruck};
 
     while (!kb_AnyKey()) {
         if (clock() - clockOffset > CLOCKS_PER_SEC / 20) {

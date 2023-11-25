@@ -72,7 +72,7 @@ converts:
       - flyingCemetech.png
       - kermMobile.png
       - grapetruck.png
-      - logicalmotorcycle.png
+      - logicalmotorcycle.png # Do not question his feet
   - name: tilesets
     palette: daytimePalette
     tilesets:
